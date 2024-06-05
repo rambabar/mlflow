@@ -15,12 +15,12 @@ from urllib.parse import urlparse
 import mlflow
 from mlflow.models import infer_signature
 import mlflow.sklearn
+import dagshub
 
 import logging
 
 logging.basicConfig(level=logging.WARN)
 logger = logging.getLogger(__name__)
-
 
 def eval_metrics(actual, pred):
     rmse = np.sqrt(mean_squared_error(actual, pred))
@@ -28,6 +28,20 @@ def eval_metrics(actual, pred):
     r2 = r2_score(actual, pred)
     return rmse, mae, r2
 
+# MLFLOW_TRACKING_URI=https://dagshub.com/rambabar/mlflow.mlflow
+# MLFLOW_TRACKING_USERNAME=rambabar
+# MLFLOW_TRACKING_PASSWORD=e963543c637702c880c617642f24c7b9d60588c9
+# python app.py
+
+# set MLFLOW_TRACKING_URI=https://dagshub.com/rambabar/mlflow.mlflow
+# set MLFLOW_TRACKING_USERNAME=rambabar
+# set MLFLOW_TRACKING_PASSWORD=e963543c637702c880c617642f24c7b9d60588c9
+# python app.py
+
+
+dagshub.init(repo_owner='rambabar', repo_name='mlflow', mlflow=True)
+remote_server_uri="https://dagshub.com/rambabar/mlflow.mlflow"
+mlflow.set_tracking_uri(remote_server_uri)
 
 if __name__ == "__main__":
     warnings.filterwarnings("ignore")
@@ -80,8 +94,6 @@ if __name__ == "__main__":
 
         ## For Remote server only(DAGShub)
 
-        remote_server_uri="https://dagshub.com/rambabar/mlflow.mlflow"
-        mlflow.set_tracking_uri(remote_server_uri)
 
         tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
 
@@ -96,3 +108,4 @@ if __name__ == "__main__":
             )
         else:
             mlflow.sklearn.log_model(lr, "model")
+
